@@ -5,13 +5,7 @@
     "rewrites": [
         {
             "source": "/api/:path*",
-            "destination": "/backend/server.js"
+            "destination": "/api"
         }
-    ],
-    "functions": {
-        "backend/server.js": {
-            "memory": 1024,
-            "maxDuration": 10
-        }
-    }
+    ]
 }
