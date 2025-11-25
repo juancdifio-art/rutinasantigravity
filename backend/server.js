@@ -10,14 +10,11 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-const apiRouter = express.Router();
-apiRouter.use('/auth', require('./src/routes/auth'));
-apiRouter.use('/professors', require('./src/routes/professors'));
-apiRouter.use('/students', require('./src/routes/students'));
-apiRouter.use('/exercises', require('./src/routes/exercises'));
-apiRouter.use('/routines', require('./src/routes/routines'));
-
-app.use('/api', apiRouter);
+app.use('/auth', require('./src/routes/auth'));
+app.use('/professors', require('./src/routes/professors'));
+app.use('/students', require('./src/routes/students'));
+app.use('/exercises', require('./src/routes/exercises'));
+app.use('/routines', require('./src/routes/routines'));
 
 // Test route
 app.get('/', (req, res) => {
