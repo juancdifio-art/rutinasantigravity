@@ -4,8 +4,60 @@ import axios from 'axios';
 
 const StudentRoutine = () => {
     const { public_share_id } = useParams();
-    const [data, setData] = useState(null);
-    const { student, routines } = data;
+    const [student, setStudent] = useState(null);
+    const [routines, setRoutines] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchRoutine = async () => {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/students/${public_share_id}/routine`);
+                setStudent(response.data.student);
+                setRoutines(response.data.routines);
+            } catch (error) {
+                console.error('Error fetching routine:', error);
+                setError('No se pudo cargar la rutina. Verifica el enlace.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (public_share_id) {
+            fetchRoutine();
+        }
+    }, [public_share_id]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Cargando rutina...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen flex items-center justify-center p-4">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md text-center">
+                    <p className="text-red-600 font-medium">{error}</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!student) {
+        return (
+            <div className="min-h-screen flex items-center justify-center p-4">
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 max-w-md text-center">
+                    <p className="text-yellow-700">No se encontró información del alumno.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-3xl mx-auto p-4 font-sans">
@@ -15,7 +67,10 @@ const StudentRoutine = () => {
             </header>
 
             {routines.length === 0 ? (
-                <p className="text-center text-gray-500">No tienes rutinas asignadas aún.</p>
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+                    <p className="text-gray-500">No tienes rutinas asignadas aún.</p>
+                    <p className="text-gray-400 text-sm mt-2">Contacta a tu entrenador para que te asigne una rutina.</p>
+                </div>
             ) : (
                 routines.map((routine) => (
                     <div key={routine.id} className="mb-8 border rounded-lg shadow-sm overflow-hidden">

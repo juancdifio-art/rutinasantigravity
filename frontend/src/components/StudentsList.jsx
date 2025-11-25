@@ -1,19 +1,22 @@
 import { useState, useEffect } from 'react';
 import studentService from '../services/studentService';
 import StudentForm from './StudentForm';
+import { useToast, ToastContainer } from '../hooks/useToast';
 
 const StudentsList = () => {
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingStudent, setEditingStudent] = useState(null);
+    const { toasts, success, error } = useToast();
 
     const fetchStudents = async () => {
         try {
             const data = await studentService.getStudents();
             setStudents(data);
-        } catch (error) {
-            console.error('Error al cargar alumnos:', error);
+        } catch (err) {
+            console.error('Error al cargar alumnos:', err);
+            error('Error al cargar alumnos');
         } finally {
             setLoading(false);
         }
@@ -38,8 +41,10 @@ const StudentsList = () => {
             try {
                 await studentService.deleteStudent(id);
                 setStudents(students.filter(s => s.id !== id));
-            } catch (error) {
-                console.error('Error al eliminar:', error);
+                success('Alumno eliminado exitosamente');
+            } catch (err) {
+                console.error('Error al eliminar:', err);
+                error('Error al eliminar alumno');
             }
         }
     };
@@ -49,27 +54,30 @@ const StudentsList = () => {
             if (editingStudent) {
                 const updated = await studentService.updateStudent(editingStudent.id, studentData);
                 setStudents(students.map(s => s.id === updated.id ? updated : s));
+                success('Alumno actualizado exitosamente');
             } else {
                 const created = await studentService.createStudent(studentData);
                 setStudents([created, ...students]);
+                success('Alumno creado exitosamente');
             }
             setIsModalOpen(false);
-        } catch (error) {
-            console.error('Error al guardar:', error);
-            alert('Error al guardar el alumno');
+        } catch (err) {
+            console.error('Error al guardar:', err);
+            error('Error al guardar el alumno');
         }
     };
 
     const copyLink = (publicId) => {
         const link = `${window.location.origin}/routine/${publicId}`;
         navigator.clipboard.writeText(link);
-        alert('Link copiado al portapapeles: ' + link);
+        success('Link copiado al portapapeles');
     };
 
     if (loading) return <div className="p-4">Cargando alumnos...</div>;
 
     return (
         <div>
+            <ToastContainer toasts={toasts} />
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">Mis Alumnos</h2>
                 <button
