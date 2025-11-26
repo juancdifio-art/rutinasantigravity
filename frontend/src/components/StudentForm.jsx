@@ -1,4 +1,3 @@
-```javascript
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, Mail, Phone, Save } from 'lucide-react';
@@ -18,7 +17,7 @@ const StudentForm = ({ student, onClose, onSave }) => {
     }, [student]);
 
     const validateEmail = (email) => {
-        if (!email) return true; // Email is optional
+        if (!email) return true;
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     };
@@ -54,7 +53,7 @@ const StudentForm = ({ student, onClose, onSave }) => {
                     onClick={onClose}
                     className="absolute inset-0 bg-black/40 backdrop-blur-sm"
                 />
-                
+
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -65,7 +64,7 @@ const StudentForm = ({ student, onClose, onSave }) => {
                         <h3 className="text-xl font-bold text-gray-900">
                             {student ? 'Editar Alumno' : 'Nuevo Alumno'}
                         </h3>
-                        <button 
+                        <button
                             onClick={onClose}
                             className="text-gray-400 hover:text-gray-600 transition-colors"
                         >
@@ -85,7 +84,7 @@ const StudentForm = ({ student, onClose, onSave }) => {
                                     setName(e.target.value);
                                     if (errors.name) setErrors({ ...errors, name: null });
                                 }}
-                                className={`input - field ${ errors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : '' } `}
+                                className={`input-field ${errors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
                                 placeholder="Ej: Juan Pérez"
                             />
                             {errors.name && <p className="text-xs text-red-500 font-medium">{errors.name}</p>}
@@ -102,7 +101,7 @@ const StudentForm = ({ student, onClose, onSave }) => {
                                     setEmail(e.target.value);
                                     if (errors.email) setErrors({ ...errors, email: null });
                                 }}
-                                className={`input - field ${ errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : '' } `}
+                                className={`input-field ${errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
                                 placeholder="ejemplo@email.com"
                             />
                             {errors.email && <p className="text-xs text-red-500 font-medium">{errors.email}</p>}
@@ -145,4 +144,3 @@ const StudentForm = ({ student, onClose, onSave }) => {
 };
 
 export default StudentForm;
-```
