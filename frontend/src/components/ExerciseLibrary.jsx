@@ -16,6 +16,10 @@ const ExerciseLibrary = () => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [videoUrl, setVideoUrl] = useState('');
+    const [category, setCategory] = useState('Otro');
+    const [selectedCategory, setSelectedCategory] = useState('Todas');
+
+    const categories = ['Todas', 'Pecho', 'Espalda', 'Piernas', 'Hombros', 'Brazos', 'Core', 'Cardio', 'Otro'];
 
     const { toasts, success, error } = useToast();
 
@@ -37,18 +41,30 @@ const ExerciseLibrary = () => {
     }, []);
 
     useEffect(() => {
-        const filtered = exercises.filter(ex =>
-            ex.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (ex.description && ex.description.toLowerCase().includes(searchTerm.toLowerCase()))
-        );
+        let filtered = exercises;
+
+        // Filter by category
+        if (selectedCategory !== 'Todas') {
+            filtered = filtered.filter(ex => ex.category === selectedCategory);
+        }
+
+        // Filter by search term
+        if (searchTerm) {
+            filtered = filtered.filter(ex =>
+                ex.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (ex.description && ex.description.toLowerCase().includes(searchTerm.toLowerCase()))
+            );
+        }
+
         setFilteredExercises(filtered);
-    }, [searchTerm, exercises]);
+    }, [searchTerm, exercises, selectedCategory]);
 
     const handleCreate = () => {
         setEditingExercise(null);
         setName('');
         setDescription('');
         setVideoUrl('');
+        setCategory('Otro');
         setIsModalOpen(true);
     };
 
@@ -57,6 +73,7 @@ const ExerciseLibrary = () => {
         setName(exercise.name);
         setDescription(exercise.description || '');
         setVideoUrl(exercise.video_url || '');
+        setCategory(exercise.category || 'Otro');
         setIsModalOpen(true);
     };
 
@@ -76,7 +93,7 @@ const ExerciseLibrary = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const exerciseData = { name, description, video_url: videoUrl };
+            const exerciseData = { name, description, video_url: videoUrl, category };
 
             if (editingExercise) {
                 const updated = await exerciseService.updateExercise(editingExercise.id, exerciseData);
@@ -115,6 +132,42 @@ const ExerciseLibrary = () => {
                     <Plus size={20} />
                     Nuevo Ejercicio
                 </button>
+            </div>
+
+            {/* Category Filter */}
+            <div className="flex flex-wrap gap-2">
+                {categories.map((cat) => (
+                    <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        className={`px-4 py-2 rounded-xl font-medium transition-all ${selectedCategory === cat
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
+                            : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                            }`}
+                    >
+                        {cat}
+                    </button>
+                ))}
+            </div>
+
+            {/* Search Bar */}
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                    type="text"
+                    placeholder="Buscar ejercicios..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="input-field pl-10 pr-10"
+                />
+                {searchTerm && (
+                    <button
+                        onClick={() => setSearchTerm('')}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                        <X size={18} />
+                    </button>
+                )}
             </div>
 
             {exercises.length === 0 ? (
@@ -171,11 +224,16 @@ const ExerciseLibrary = () => {
                                         className="card p-5 flex flex-col gap-3 group"
                                     >
                                         <div className="flex justify-between items-start">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600">
-                                                    <Dumbbell size={20} />
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600">
+                                                        <Dumbbell size={20} />
+                                                    </div>
+                                                    <h3 className="font-bold text-gray-900 line-clamp-1">{exercise.name}</h3>
                                                 </div>
-                                                <h3 className="font-bold text-gray-900 line-clamp-1">{exercise.name}</h3>
+                                                <span className="inline-block text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full font-medium">
+                                                    {exercise.category || 'Otro'}
+                                                </span>
                                             </div>
                                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button
@@ -266,6 +324,20 @@ const ExerciseLibrary = () => {
                                         className="input-field min-h-[100px] py-3 resize-none"
                                         placeholder="Describe la técnica correcta..."
                                     />
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className="text-sm font-medium text-gray-700">Categoría *</label>
+                                    <select
+                                        value={category}
+                                        onChange={(e) => setCategory(e.target.value)}
+                                        className="input-field"
+                                        required
+                                    >
+                                        {categories.filter(cat => cat !== 'Todas').map((cat) => (
+                                            <option key={cat} value={cat}>{cat}</option>
+                                        ))}
+                                    </select>
                                 </div>
 
                                 <div className="space-y-1">
