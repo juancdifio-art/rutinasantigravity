@@ -38,58 +38,58 @@ const ExerciseLibrary = () => {
 
     const categoryStyles = {
         'Pecho': {
-            active: 'bg-red-600 text-white border-red-600 shadow-lg shadow-red-600/20',
-            inactive: 'bg-white text-gray-600 border-gray-200 hover:border-red-300 hover:bg-red-50 hover:text-red-600',
-            badge: 'bg-red-100 text-red-600',
-            badgeLight: 'bg-red-50 text-red-600'
+            active: 'bg-red-600 text-white border-red-500 shadow-lg shadow-red-900/20',
+            inactive: 'bg-slate-900 text-slate-400 border-slate-800 hover:border-red-500/50 hover:bg-red-950/30 hover:text-red-400',
+            badge: 'bg-red-500/10 text-red-400 border border-red-500/20',
+            badgeLight: 'bg-red-500/10 text-red-400 border border-red-500/20'
         },
         'Espalda': {
-            active: 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/20',
-            inactive: 'bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600',
-            badge: 'bg-blue-100 text-blue-600',
-            badgeLight: 'bg-blue-50 text-blue-600'
+            active: 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-900/20',
+            inactive: 'bg-slate-900 text-slate-400 border-slate-800 hover:border-blue-500/50 hover:bg-blue-950/30 hover:text-blue-400',
+            badge: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
+            badgeLight: 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
         },
         'Piernas': {
-            active: 'bg-green-600 text-white border-green-600 shadow-lg shadow-green-600/20',
-            inactive: 'bg-white text-gray-600 border-gray-200 hover:border-green-300 hover:bg-green-50 hover:text-green-600',
-            badge: 'bg-green-100 text-green-600',
-            badgeLight: 'bg-green-50 text-green-600'
+            active: 'bg-green-600 text-white border-green-500 shadow-lg shadow-green-900/20',
+            inactive: 'bg-slate-900 text-slate-400 border-slate-800 hover:border-green-500/50 hover:bg-green-950/30 hover:text-green-400',
+            badge: 'bg-green-500/10 text-green-400 border border-green-500/20',
+            badgeLight: 'bg-green-500/10 text-green-400 border border-green-500/20'
         },
         'Hombros': {
-            active: 'bg-orange-600 text-white border-orange-600 shadow-lg shadow-orange-600/20',
-            inactive: 'bg-white text-gray-600 border-gray-200 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600',
-            badge: 'bg-orange-100 text-orange-600',
-            badgeLight: 'bg-orange-50 text-orange-600'
+            active: 'bg-orange-600 text-white border-orange-500 shadow-lg shadow-orange-900/20',
+            inactive: 'bg-slate-900 text-slate-400 border-slate-800 hover:border-orange-500/50 hover:bg-orange-950/30 hover:text-orange-400',
+            badge: 'bg-orange-500/10 text-orange-400 border border-orange-500/20',
+            badgeLight: 'bg-orange-500/10 text-orange-400 border border-orange-500/20'
         },
         'Brazos': {
-            active: 'bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-600/20',
-            inactive: 'bg-white text-gray-600 border-gray-200 hover:border-purple-300 hover:bg-purple-50 hover:text-purple-600',
-            badge: 'bg-purple-100 text-purple-600',
-            badgeLight: 'bg-purple-50 text-purple-600'
+            active: 'bg-purple-600 text-white border-purple-500 shadow-lg shadow-purple-900/20',
+            inactive: 'bg-slate-900 text-slate-400 border-slate-800 hover:border-purple-500/50 hover:bg-purple-950/30 hover:text-purple-400',
+            badge: 'bg-purple-500/10 text-purple-400 border border-purple-500/20',
+            badgeLight: 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
         },
         'Core': {
-            active: 'bg-yellow-500 text-white border-yellow-500 shadow-lg shadow-yellow-500/20',
-            inactive: 'bg-white text-gray-600 border-gray-200 hover:border-yellow-300 hover:bg-yellow-50 hover:text-yellow-600',
-            badge: 'bg-yellow-100 text-yellow-700',
-            badgeLight: 'bg-yellow-50 text-yellow-700'
+            active: 'bg-yellow-500 text-white border-yellow-400 shadow-lg shadow-yellow-900/20',
+            inactive: 'bg-slate-900 text-slate-400 border-slate-800 hover:border-yellow-500/50 hover:bg-yellow-950/30 hover:text-yellow-400',
+            badge: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20',
+            badgeLight: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
         },
         'Cardio': {
-            active: 'bg-pink-600 text-white border-pink-600 shadow-lg shadow-pink-600/20',
-            inactive: 'bg-white text-gray-600 border-gray-200 hover:border-pink-300 hover:bg-pink-50 hover:text-pink-600',
-            badge: 'bg-pink-100 text-pink-600',
-            badgeLight: 'bg-pink-50 text-pink-600'
+            active: 'bg-pink-600 text-white border-pink-500 shadow-lg shadow-pink-900/20',
+            inactive: 'bg-slate-900 text-slate-400 border-slate-800 hover:border-pink-500/50 hover:bg-pink-950/30 hover:text-pink-400',
+            badge: 'bg-pink-500/10 text-pink-400 border border-pink-500/20',
+            badgeLight: 'bg-pink-500/10 text-pink-400 border border-pink-500/20'
         },
         'Otro': {
-            active: 'bg-gray-600 text-white border-gray-600 shadow-lg shadow-gray-600/20',
-            inactive: 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-600',
-            badge: 'bg-gray-100 text-gray-600',
-            badgeLight: 'bg-gray-50 text-gray-600'
+            active: 'bg-slate-600 text-white border-slate-500 shadow-lg shadow-slate-900/20',
+            inactive: 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-500/50 hover:bg-slate-800 hover:text-slate-300',
+            badge: 'bg-slate-700/50 text-slate-300 border border-slate-600/30',
+            badgeLight: 'bg-slate-700/50 text-slate-300 border border-slate-600/30'
         },
         'Todas': {
-            active: 'bg-gray-800 text-white border-gray-800 shadow-lg shadow-gray-800/20',
-            inactive: 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800',
-            badge: 'bg-gray-100 text-gray-600',
-            badgeLight: 'bg-gray-50 text-gray-600'
+            active: 'bg-slate-700 text-white border-slate-600 shadow-lg shadow-slate-900/20',
+            inactive: 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200',
+            badge: 'bg-slate-700/50 text-slate-300',
+            badgeLight: 'bg-slate-700/50 text-slate-300'
         }
     };
 
@@ -214,8 +214,8 @@ const ExerciseLibrary = () => {
 
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h2 className="text-3xl font-bold text-gray-900">Biblioteca de Ejercicios</h2>
-                    <p className="text-gray-500 mt-1">Administra los ejercicios disponibles para las rutinas</p>
+                    <h2 className="text-3xl font-bold text-white">Biblioteca de Ejercicios</h2>
+                    <p className="text-slate-400 mt-1">Administra los ejercicios disponibles para las rutinas</p>
                 </div>
                 <button onClick={handleCreate} className="btn-primary flex items-center gap-2">
                     <Plus size={20} />
@@ -302,7 +302,7 @@ const ExerciseLibrary = () => {
                                                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${getCategoryStyle(exercise.category || 'Otro').badge}`}>
                                                         {getCategoryEmoji(exercise.category || 'Otro')}
                                                     </div>
-                                                    <h3 className="font-bold text-gray-900 line-clamp-1">{exercise.name}</h3>
+                                                    <h3 className="font-bold text-white line-clamp-1">{exercise.name}</h3>
                                                 </div>
                                                 <span className={`inline-block text-xs px-2 py-1 rounded-full font-medium ${getCategoryStyle(exercise.category || 'Otro').badgeLight}`}>
                                                     {exercise.category || 'Otro'}
@@ -324,7 +324,7 @@ const ExerciseLibrary = () => {
                                             </div>
                                         </div>
 
-                                        <p className="text-sm text-gray-600 line-clamp-2 min-h-[2.5rem]">
+                                        <p className="text-sm text-slate-400 line-clamp-2 min-h-[2.5rem]">
                                             {exercise.description || 'Sin descripción'}
                                         </p>
 

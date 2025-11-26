@@ -33,40 +33,40 @@ const RoutinesList = () => {
 
     const categoryStyles = {
         'Pecho': {
-            badge: 'bg-red-100 text-red-600',
-            badgeLight: 'bg-red-50 text-red-600'
+            badge: 'bg-red-500/10 text-red-400 border border-red-500/20',
+            badgeLight: 'bg-red-500/10 text-red-400 border border-red-500/20'
         },
         'Espalda': {
-            badge: 'bg-blue-100 text-blue-600',
-            badgeLight: 'bg-blue-50 text-blue-600'
+            badge: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
+            badgeLight: 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
         },
         'Piernas': {
-            badge: 'bg-green-100 text-green-600',
-            badgeLight: 'bg-green-50 text-green-600'
+            badge: 'bg-green-500/10 text-green-400 border border-green-500/20',
+            badgeLight: 'bg-green-500/10 text-green-400 border border-green-500/20'
         },
         'Hombros': {
-            badge: 'bg-orange-100 text-orange-600',
-            badgeLight: 'bg-orange-50 text-orange-600'
+            badge: 'bg-orange-500/10 text-orange-400 border border-orange-500/20',
+            badgeLight: 'bg-orange-500/10 text-orange-400 border border-orange-500/20'
         },
         'Brazos': {
-            badge: 'bg-purple-100 text-purple-600',
-            badgeLight: 'bg-purple-50 text-purple-600'
+            badge: 'bg-purple-500/10 text-purple-400 border border-purple-500/20',
+            badgeLight: 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
         },
         'Core': {
-            badge: 'bg-yellow-100 text-yellow-700',
-            badgeLight: 'bg-yellow-50 text-yellow-700'
+            badge: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20',
+            badgeLight: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
         },
         'Cardio': {
-            badge: 'bg-pink-100 text-pink-600',
-            badgeLight: 'bg-pink-50 text-pink-600'
+            badge: 'bg-pink-500/10 text-pink-400 border border-pink-500/20',
+            badgeLight: 'bg-pink-500/10 text-pink-400 border border-pink-500/20'
         },
         'Otro': {
-            badge: 'bg-gray-100 text-gray-600',
-            badgeLight: 'bg-gray-50 text-gray-600'
+            badge: 'bg-slate-700/50 text-slate-300 border border-slate-600/30',
+            badgeLight: 'bg-slate-700/50 text-slate-300 border border-slate-600/30'
         },
         'Todas': {
-            badge: 'bg-gray-100 text-gray-600',
-            badgeLight: 'bg-gray-50 text-gray-600'
+            badge: 'bg-slate-700/50 text-slate-300',
+            badgeLight: 'bg-slate-700/50 text-slate-300'
         }
     };
 
@@ -202,8 +202,8 @@ const RoutinesList = () => {
 
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h2 className="text-3xl font-bold text-gray-900">Gestión de Rutinas</h2>
-                    <p className="text-gray-500 mt-1">Asigna y administra las rutinas de tus alumnos</p>
+                    <h2 className="text-3xl font-bold text-white">Gestión de Rutinas</h2>
+                    <p className="text-slate-400 mt-1">Asigna y administra las rutinas de tus alumnos</p>
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
@@ -255,7 +255,7 @@ const RoutinesList = () => {
                                         </div>
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2 mb-1">
-                                                <h3 className="font-bold text-gray-900 text-lg">{routine.name || 'Rutina sin nombre'}</h3>
+                                                <h3 className="font-bold text-white text-lg">{routine.name || 'Rutina sin nombre'}</h3>
                                                 {routine.student_name && (
                                                     <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full font-medium flex items-center gap-1">
                                                         <User size={12} />
@@ -264,7 +264,7 @@ const RoutinesList = () => {
                                                 )}
                                             </div>
                                             {routine.description && (
-                                                <p className="text-sm text-gray-500 line-clamp-1">{routine.description}</p>
+                                                <p className="text-sm text-slate-400 line-clamp-1">{routine.description}</p>
                                             )}
                                             <div className="flex items-center gap-3 mt-2">
                                                 <div className="flex items-center gap-1 text-xs text-gray-400">
@@ -314,7 +314,7 @@ const RoutinesList = () => {
                                                                     {getCategoryEmoji(ex.category || 'Otro')}
                                                                 </div>
                                                                 <div>
-                                                                    <span className="font-medium text-gray-900 block">{ex.exercise_name}</span>
+                                                                    <span className="font-medium text-white block">{ex.exercise_name}</span>
                                                                     <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mt-1 ${getCategoryStyle(ex.category || 'Otro').badgeLight}`}>
                                                                         {ex.category || 'Otro'}
                                                                     </span>
