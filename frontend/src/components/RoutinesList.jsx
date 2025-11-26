@@ -156,22 +156,36 @@ const RoutinesList = () => {
                                     className="p-5 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
                                     onClick={() => toggleExpand(routine.id)}
                                 >
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                                            {routine.student_name ? routine.student_name.charAt(0).toUpperCase() : '?'}
+                                    <div className="flex items-center gap-4 flex-1">
+                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20">
+                                            <ClipboardList size={24} />
                                         </div>
-                                        <div>
-                                            <h3 className="font-bold text-gray-900">{routine.student_name || 'Alumno desconocido'}</h3>
-                                            <div className="flex items-center gap-2 text-sm text-gray-500">
-                                                <Calendar size={14} />
-                                                {new Date(routine.created_at).toLocaleDateString()}
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <h3 className="font-bold text-gray-900 text-lg">{routine.name || 'Rutina sin nombre'}</h3>
+                                                {routine.student_name && (
+                                                    <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                                                        <User size={12} />
+                                                        {routine.student_name}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            {routine.description && (
+                                                <p className="text-sm text-gray-500 line-clamp-1">{routine.description}</p>
+                                            )}
+                                            <div className="flex items-center gap-3 mt-2">
+                                                <div className="flex items-center gap-1 text-xs text-gray-400">
+                                                    <Calendar size={12} />
+                                                    {new Date(routine.created_at).toLocaleDateString()}
+                                                </div>
+                                                <span className="text-xs text-gray-400">•</span>
+                                                <span className="text-xs text-gray-500 font-medium">
+                                                    {routine.exercises ? routine.exercises.length : 0} ejercicios
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                                            {routine.exercises ? routine.exercises.length : 0} ejercicios
-                                        </span>
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleDelete(routine.id); }}
                                             className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -202,8 +216,8 @@ const RoutinesList = () => {
                                                                 <span className="font-medium text-gray-900">{ex.exercise_name}</span>
                                                             </div>
                                                             <div className="flex gap-4 text-sm text-gray-600">
-                                                                <span className="bg-gray-100 px-2 py-1 rounded-md"><b>{ex.sets}</b> series</span>
-                                                                <span className="bg-gray-100 px-2 py-1 rounded-md"><b>{ex.reps}</b> reps</span>
+                                                                <span className="bg-gray-100 px-2 py-1 rounded-md"><b>{ex.series}</b> series</span>
+                                                                <span className="bg-gray-100 px-2 py-1 rounded-md"><b>{ex.repetitions}</b> reps</span>
                                                                 {ex.weight && <span className="bg-gray-100 px-2 py-1 rounded-md"><b>{ex.weight}</b> kg</span>}
                                                             </div>
                                                         </div>
