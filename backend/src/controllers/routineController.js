@@ -72,32 +72,22 @@ const getRoutineById = async (req, res) => {
 };
 
 const createRoutine = async (req, res) => {
-    const { student_id, exercises } = req.body;
-    // exercises debe ser un array de objetos: { exercise_id, sets, reps, weight }
+    const { name, description, exercises } = req.body;
+    // exercises debe ser un array de objetos: { exercise_id, sets/series, reps/repetitions, weight }
+
+    if (!name || !name.trim()) {
+        return res.status(400).json({ message: 'El nombre de la rutina es requerido' });
+    }
 
     const client = await db.pool.connect();
 
     try {
         await client.query('BEGIN');
 
-        // Verificar que el alumno pertenece al profesor
-        const studentCheck = await client.query(
-            'SELECT id, name FROM students WHERE id = $1 AND professor_id = $2',
-            [student_id, req.user.id]
-        );
-
-        if (studentCheck.rows.length === 0) {
-            await client.query('ROLLBACK');
-            return res.status(404).json({ message: 'Alumno no encontrado' });
-        }
-
-        const studentName = studentCheck.rows[0].name;
-
-        // 1. Crear Rutina con nombre automático basado en el alumno
-        const routineName = `Rutina de ${studentName}`;
+        // 1. Crear Rutina con nombre personalizado
         const routineResult = await client.query(
             'INSERT INTO routines (professor_id, name, description) VALUES ($1, $2, $3) RETURNING *',
-            [req.user.id, routineName, `Rutina personalizada para ${studentName}`]
+            [req.user.id, name.trim(), description?.trim() || '']
         );
         const routine = routineResult.rows[0];
 
@@ -123,20 +113,10 @@ const createRoutine = async (req, res) => {
             }
         }
 
-        // 3. Asignar automáticamente la rutina al alumno
-        await client.query(
-            'INSERT INTO student_routines (student_id, routine_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
-            [student_id, routine.id]
-        );
-
         await client.query('COMMIT');
 
-        // Devolver la rutina con información del estudiante
-        res.status(201).json({
-            ...routine,
-            student_name: studentName,
-            exercises: exercises
-        });
+        // Devolver la rutina creada
+        res.status(201).json(routine);
 
     } catch (error) {
         await client.query('ROLLBACK');

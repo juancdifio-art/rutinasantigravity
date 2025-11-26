@@ -16,7 +16,8 @@ const RoutinesList = () => {
     const { toasts, success, error } = useToast();
 
     // Form State
-    const [selectedStudent, setSelectedStudent] = useState('');
+    const [routineName, setRoutineName] = useState('');
+    const [routineDescription, setRoutineDescription] = useState('');
     const [routineExercises, setRoutineExercises] = useState([{ exercise_id: '', sets: '', reps: '', weight: '' }]);
 
     const fetchData = async () => {
@@ -60,14 +61,16 @@ const RoutinesList = () => {
         e.preventDefault();
         try {
             const routineData = {
-                student_id: selectedStudent,
+                name: routineName,
+                description: routineDescription,
                 exercises: routineExercises
             };
             const created = await routineService.createRoutine(routineData);
             setRoutines([created, ...routines]);
             success('Rutina creada exitosamente');
             setIsModalOpen(false);
-            setSelectedStudent('');
+            setRoutineName('');
+            setRoutineDescription('');
             setRoutineExercises([{ exercise_id: '', sets: '', reps: '', weight: '' }]);
         } catch (err) {
             console.error('Error al crear rutina:', err);
@@ -244,21 +247,33 @@ const RoutinesList = () => {
                             </div>
 
                             <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                                <div className="space-y-1">
-                                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                                        <User size={16} /> Alumno
-                                    </label>
-                                    <select
-                                        value={selectedStudent}
-                                        onChange={(e) => setSelectedStudent(e.target.value)}
-                                        className="input-field"
-                                        required
-                                    >
-                                        <option value="">Seleccionar alumno...</option>
-                                        {students.map(s => (
-                                            <option key={s.id} value={s.id}>{s.name}</option>
-                                        ))}
-                                    </select>
+                                <div className="space-y-4">
+                                    <div className="space-y-1">
+                                        <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                                            <ClipboardList size={16} /> Nombre de la Rutina *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={routineName}
+                                            onChange={(e) => setRoutineName(e.target.value)}
+                                            className="input-field"
+                                            placeholder="Ej: Rutina de Fuerza"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <label className="text-sm font-medium text-gray-700">
+                                            Descripción (Opcional)
+                                        </label>
+                                        <textarea
+                                            value={routineDescription}
+                                            onChange={(e) => setRoutineDescription(e.target.value)}
+                                            className="input-field resize-none"
+                                            rows="2"
+                                            placeholder="Descripción de la rutina..."
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="space-y-4">
