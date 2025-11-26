@@ -1,56 +1,82 @@
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, ClipboardList, Trash2, ChevronDown, ChevronUp, Dumbbell, Calendar, User, Save, X } from 'lucide-react';
 import routineService from '../services/routineService';
 import studentService from '../services/studentService';
-import RoutineForm from './RoutineForm';
+import exerciseService from '../services/exerciseService';
 import { useToast, ToastContainer } from '../hooks/useToast';
 
 const RoutinesList = () => {
     const [routines, setRoutines] = useState([]);
+    const [students, setStudents] = useState([]);
+    const [exercises, setExercises] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingRoutine, setEditingRoutine] = useState(null);
+    const [expandedRoutine, setExpandedRoutine] = useState(null);
     const { toasts, success, error } = useToast();
 
-    // Assign Modal State
-    const [assignModalOpen, setAssignModalOpen] = useState(false);
-    const [selectedRoutineId, setSelectedRoutineId] = useState(null);
-    const [students, setStudents] = useState([]);
-    const [selectedStudentId, setSelectedStudentId] = useState('');
+    // Form State
+    const [selectedStudent, setSelectedStudent] = useState('');
+    const [routineExercises, setRoutineExercises] = useState([{ exercise_id: '', sets: '', reps: '', weight: '' }]);
 
-    const fetchRoutines = async () => {
+    const fetchData = async () => {
         try {
-            const data = await routineService.getRoutines();
-            setRoutines(data);
+            const [routinesData, studentsData, exercisesData] = await Promise.all([
+                routineService.getRoutines(),
+                studentService.getStudents(),
+                exerciseService.getExercises()
+            ]);
+            setRoutines(routinesData);
+            setStudents(studentsData);
+            setExercises(exercisesData);
         } catch (err) {
-            console.error('Error al cargar rutinas:', err);
-            error('Error al cargar rutinas');
+            console.error('Error al cargar datos:', err);
+            error('Error al cargar datos');
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchRoutines();
+        fetchData();
     }, []);
 
-    const handleCreate = () => {
-        setEditingRoutine(null);
-        setIsModalOpen(true);
+    const handleAddExerciseRow = () => {
+        setRoutineExercises([...routineExercises, { exercise_id: '', sets: '', reps: '', weight: '' }]);
     };
 
-    const handleEdit = async (id) => {
+    const handleRemoveExerciseRow = (index) => {
+        const newExercises = routineExercises.filter((_, i) => i !== index);
+        setRoutineExercises(newExercises);
+    };
+
+    const handleExerciseChange = (index, field, value) => {
+        const newExercises = [...routineExercises];
+        newExercises[index][field] = value;
+        setRoutineExercises(newExercises);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         try {
-            const fullRoutine = await routineService.getRoutineById(id);
-            setEditingRoutine(fullRoutine);
-            setIsModalOpen(true);
+            const routineData = {
+                student_id: selectedStudent,
+                exercises: routineExercises
+            };
+            const created = await routineService.createRoutine(routineData);
+            setRoutines([created, ...routines]);
+            success('Rutina creada exitosamente');
+            setIsModalOpen(false);
+            setSelectedStudent('');
+            setRoutineExercises([{ exercise_id: '', sets: '', reps: '', weight: '' }]);
         } catch (err) {
-            console.error('Error al cargar detalles de rutina', err);
-            error('Error al cargar rutina');
+            console.error('Error al crear rutina:', err);
+            error('Error al crear rutina');
         }
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('¿Eliminar rutina?')) {
+        if (window.confirm('¿Eliminar esta rutina?')) {
             try {
                 await routineService.deleteRoutine(id);
                 setRoutines(routines.filter(r => r.id !== id));
@@ -62,166 +88,273 @@ const RoutinesList = () => {
         }
     };
 
-    const handleSave = async (routineData) => {
-        try {
-            if (editingRoutine) {
-                await routineService.updateRoutine(editingRoutine.id, routineData);
-                success('Rutina actualizada exitosamente');
-            } else {
-                await routineService.createRoutine(routineData);
-                success('Rutina creada exitosamente');
-            }
-            fetchRoutines();
-            setIsModalOpen(false);
-        } catch (err) {
-            console.error('Error al guardar:', err);
-            error('Error al guardar la rutina');
-        }
-    };
-
-    const openAssignModal = async (routineId) => {
-        setSelectedRoutineId(routineId);
-        try {
-            const studentsData = await studentService.getStudents();
-            setStudents(studentsData);
-            if (studentsData.length > 0) setSelectedStudentId(studentsData[0].id);
-            setAssignModalOpen(true);
-        } catch (err) {
-            console.error('Error al cargar alumnos', err);
-            error('Error al cargar alumnos');
-        }
-    };
-
-    const handleAssign = async () => {
-        try {
-            await routineService.assignRoutine(selectedRoutineId, selectedStudentId);
-            success('Rutina asignada exitosamente');
-            setAssignModalOpen(false);
-        } catch (err) {
-            console.error('Error al asignar', err);
-            error('Error al asignar rutina');
-        }
+    const toggleExpand = (id) => {
+        setExpandedRoutine(expandedRoutine === id ? null : id);
     };
 
     if (loading) {
         return (
             <div className="flex items-center justify-center p-12">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p className="text-gray-600">Cargando rutinas...</p>
-                </div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
             </div>
         );
     }
 
     return (
-        <div>
+        <div className="space-y-6">
             <ToastContainer toasts={toasts} />
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Mis Rutinas</h2>
+
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 className="text-3xl font-bold text-gray-900">Gestión de Rutinas</h2>
+                    <p className="text-gray-500 mt-1">Asigna y administra las rutinas de tus alumnos</p>
+                </div>
                 <button
-                    onClick={handleCreate}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                    onClick={() => setIsModalOpen(true)}
+                    className="btn-primary flex items-center gap-2"
                 >
-                    + Nueva Rutina
+                    <Plus size={20} />
+                    Nueva Rutina
                 </button>
             </div>
 
             {routines.length === 0 ? (
-                <div className="text-center py-16 bg-white rounded-lg shadow">
-                    <svg className="mx-auto h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                    </svg>
-                    <h3 className="mt-4 text-lg font-medium text-gray-900">No hay rutinas creadas</h3>
-                    <p className="mt-2 text-sm text-gray-500">Crea rutinas combinando ejercicios para asignar a tus alumnos.</p>
-                    <button
-                        onClick={handleCreate}
-                        className="mt-6 inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                    >
-                        + Crear Primera Rutina
-                    </button>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {routines.map((routine) => (
-                        <div key={routine.id} className="bg-white rounded-lg shadow border border-gray-200 flex flex-col">
-                            <div className="p-5 flex-1">
-                                <h3 className="font-bold text-xl text-gray-800 mb-2">{routine.name}</h3>
-                                <p className="text-gray-600 text-sm mb-4">{routine.description || 'Sin descripción'}</p>
-                                <div className="text-sm text-gray-500 bg-gray-50 p-2 rounded inline-block">
-                                    {routine.exercise_count} Ejercicios
-                                </div>
-                            </div>
-
-                            <div className="p-4 border-t bg-gray-50 flex justify-between items-center rounded-b-lg">
-                                <button
-                                    onClick={() => openAssignModal(routine.id)}
-                                    className="text-sm font-medium text-green-600 hover:text-green-800"
-                                >
-                                    Asignar a Alumno
-                                </button>
-                                <div className="flex gap-3">
-                                    <button
-                                        onClick={() => handleEdit(routine.id)}
-                                        className="text-sm text-blue-600 hover:text-blue-800"
-                                    >
-                                        Editar
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(routine.id)}
-                                        className="text-sm text-red-600 hover:text-red-800"
-                                    >
-                                        Eliminar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
-
-            {isModalOpen && (
-                <RoutineForm
-                    routine={editingRoutine}
-                    onClose={() => setIsModalOpen(false)}
-                    onSave={handleSave}
-                />
-            )}
-
-            {/* Assign Modal */}
-            {assignModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-sm p-6">
-                        <h3 className="text-lg font-bold mb-4">Asignar Rutina</h3>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Seleccionar Alumno</label>
-                            <select
-                                value={selectedStudentId}
-                                onChange={(e) => setSelectedStudentId(e.target.value)}
-                                className="w-full border border-gray-300 rounded p-2"
-                            >
-                                {students.map(s => (
-                                    <option key={s.id} value={s.id}>{s.name}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="flex justify-end gap-3">
-                            <button
-                                onClick={() => setAssignModalOpen(false)}
-                                className="px-4 py-2 text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleAssign}
-                                className="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700"
-                            >
-                                Asignar
-                            </button>
-                        </div>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100"
+                >
+                    <div className="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <ClipboardList size={40} className="text-blue-600" />
                     </div>
+                    <h3 className="text-xl font-bold text-gray-900">No hay rutinas creadas</h3>
+                    <p className="mt-2 text-gray-500">Crea la primera rutina para comenzar a entrenar a tus alumnos.</p>
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="mt-6 btn-primary inline-flex items-center gap-2"
+                    >
+                        <Plus size={20} />
+                        Crear Primera Rutina
+                    </button>
+                </motion.div>
+            ) : (
+                <div className="space-y-4">
+                    <AnimatePresence>
+                        {routines.map((routine) => (
+                            <motion.div
+                                key={routine.id}
+                                layout
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                className="card overflow-hidden"
+                            >
+                                <div
+                                    className="p-5 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
+                                    onClick={() => toggleExpand(routine.id)}
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                                            {routine.student_name ? routine.student_name.charAt(0).toUpperCase() : '?'}
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-gray-900">{routine.student_name || 'Alumno desconocido'}</h3>
+                                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                                                <Calendar size={14} />
+                                                {new Date(routine.created_at).toLocaleDateString()}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                                            {routine.exercises ? routine.exercises.length : 0} ejercicios
+                                        </span>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); handleDelete(routine.id); }}
+                                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                        {expandedRoutine === routine.id ? <ChevronUp size={20} className="text-gray-400" /> : <ChevronDown size={20} className="text-gray-400" />}
+                                    </div>
+                                </div>
+
+                                <AnimatePresence>
+                                    {expandedRoutine === routine.id && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            className="border-t border-gray-100 bg-gray-50/50"
+                                        >
+                                            <div className="p-5">
+                                                <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Detalle de Ejercicios</h4>
+                                                <div className="grid gap-3">
+                                                    {routine.exercises && routine.exercises.map((ex, idx) => (
+                                                        <div key={idx} className="bg-white p-3 rounded-xl border border-gray-100 flex items-center justify-between">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="bg-blue-50 p-2 rounded-lg text-blue-600">
+                                                                    <Dumbbell size={16} />
+                                                                </div>
+                                                                <span className="font-medium text-gray-900">{ex.exercise_name}</span>
+                                                            </div>
+                                                            <div className="flex gap-4 text-sm text-gray-600">
+                                                                <span className="bg-gray-100 px-2 py-1 rounded-md"><b>{ex.sets}</b> series</span>
+                                                                <span className="bg-gray-100 px-2 py-1 rounded-md"><b>{ex.reps}</b> reps</span>
+                                                                {ex.weight && <span className="bg-gray-100 px-2 py-1 rounded-md"><b>{ex.weight}</b> kg</span>}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
                 </div>
             )}
+
+            <AnimatePresence>
+                {isModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsModalOpen(false)}
+                            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                        />
+
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="relative bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+                        >
+                            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 sticky top-0 z-10 backdrop-blur-md">
+                                <h3 className="text-xl font-bold text-gray-900">Nueva Rutina</h3>
+                                <button
+                                    onClick={() => setIsModalOpen(false)}
+                                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                                >
+                                    <X size={24} />
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                                <div className="space-y-1">
+                                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                                        <User size={16} /> Alumno
+                                    </label>
+                                    <select
+                                        value={selectedStudent}
+                                        onChange={(e) => setSelectedStudent(e.target.value)}
+                                        className="input-field"
+                                        required
+                                    >
+                                        <option value="">Seleccionar alumno...</option>
+                                        {students.map(s => (
+                                            <option key={s.id} value={s.id}>{s.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                                            <Dumbbell size={16} /> Ejercicios
+                                        </label>
+                                        <button
+                                            type="button"
+                                            onClick={handleAddExerciseRow}
+                                            className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                                        >
+                                            <Plus size={16} /> Agregar Ejercicio
+                                        </button>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        {routineExercises.map((row, index) => (
+                                            <motion.div
+                                                key={index}
+                                                initial={{ opacity: 0, x: -10 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                className="flex flex-col sm:flex-row gap-3 items-start sm:items-center bg-gray-50 p-3 rounded-xl border border-gray-100"
+                                            >
+                                                <select
+                                                    value={row.exercise_id}
+                                                    onChange={(e) => handleExerciseChange(index, 'exercise_id', e.target.value)}
+                                                    className="input-field flex-grow"
+                                                    required
+                                                >
+                                                    <option value="">Seleccionar ejercicio...</option>
+                                                    {exercises.map(ex => (
+                                                        <option key={ex.id} value={ex.id}>{ex.name}</option>
+                                                    ))}
+                                                </select>
+
+                                                <div className="flex gap-2 w-full sm:w-auto">
+                                                    <input
+                                                        type="number"
+                                                        placeholder="Series"
+                                                        value={row.sets}
+                                                        onChange={(e) => handleExerciseChange(index, 'sets', e.target.value)}
+                                                        className="input-field w-20"
+                                                        required
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Reps"
+                                                        value={row.reps}
+                                                        onChange={(e) => handleExerciseChange(index, 'reps', e.target.value)}
+                                                        className="input-field w-20"
+                                                        required
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Kg"
+                                                        value={row.weight}
+                                                        onChange={(e) => handleExerciseChange(index, 'weight', e.target.value)}
+                                                        className="input-field w-20"
+                                                    />
+                                                    {routineExercises.length > 1 && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveExerciseRow(index)}
+                                                            className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                        >
+                                                            <Trash2 size={18} />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsModalOpen(false)}
+                                        className="btn-secondary"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="btn-primary flex items-center gap-2"
+                                    >
+                                        <Save size={18} />
+                                        Guardar Rutina
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

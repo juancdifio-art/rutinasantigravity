@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Plus, User, Mail, Phone, Link as LinkIcon, Edit2, Trash2, X, Users } from 'lucide-react';
 import studentService from '../services/studentService';
 import StudentForm from './StudentForm';
 import { useToast, ToastContainer } from '../hooks/useToast';
@@ -88,147 +90,130 @@ const StudentsList = () => {
     if (loading) {
         return (
             <div className="flex items-center justify-center p-12">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p className="text-gray-600">Cargando alumnos...</p>
-                </div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
             </div>
         );
     }
 
     return (
-        <div>
+        <div className="space-y-6">
             <ToastContainer toasts={toasts} />
 
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Mis Alumnos</h2>
-                <button
-                    onClick={handleCreate}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center gap-2"
-                >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 className="text-3xl font-bold text-gray-900">Mis Alumnos</h2>
+                    <p className="text-gray-500 mt-1">Gestiona tus alumnos y sus rutinas</p>
+                </div>
+                <button onClick={handleCreate} className="btn-primary flex items-center gap-2">
+                    <Plus size={20} />
                     Nuevo Alumno
                 </button>
             </div>
 
             {students.length === 0 ? (
-                <div className="text-center py-16 bg-white rounded-lg shadow">
-                    <svg className="mx-auto h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    <h3 className="mt-4 text-lg font-medium text-gray-900">No hay alumnos registrados</h3>
-                    <p className="mt-2 text-sm text-gray-500">Comienza agregando tu primer alumno para asignarle rutinas.</p>
-                    <button
-                        onClick={handleCreate}
-                        className="mt-6 inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                    >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100"
+                >
+                    <div className="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Users size={40} className="text-blue-600" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900">No hay alumnos registrados</h3>
+                    <p className="mt-2 text-gray-500">Comienza agregando tu primer alumno para asignarle rutinas.</p>
+                    <button onClick={handleCreate} className="mt-6 btn-primary inline-flex items-center gap-2">
+                        <Plus size={20} />
                         Crear Primer Alumno
                     </button>
-                </div>
+                </motion.div>
             ) : (
                 <>
-                    {/* Search Bar */}
-                    <div className="mb-4">
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            </div>
-                            <input
-                                type="text"
-                                placeholder="Buscar por nombre, email o teléfono..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            />
-                            {searchTerm && (
-                                <button
-                                    onClick={() => setSearchTerm('')}
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                >
-                                    <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            )}
-                        </div>
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                        <input
+                            type="text"
+                            placeholder="Buscar por nombre, email o teléfono..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="input-field pl-10"
+                        />
                         {searchTerm && (
-                            <p className="mt-2 text-sm text-gray-600">
-                                {filteredStudents.length} {filteredStudents.length === 1 ? 'resultado' : 'resultados'}
-                            </p>
+                            <button
+                                onClick={() => setSearchTerm('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            >
+                                <X size={16} />
+                            </button>
                         )}
                     </div>
 
                     {filteredStudents.length === 0 ? (
-                        <div className="text-center py-12 bg-white rounded-lg shadow">
-                            <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <h3 className="mt-4 text-lg font-medium text-gray-900">No se encontraron resultados</h3>
-                            <p className="mt-2 text-sm text-gray-500">Intenta con otro término de búsqueda.</p>
-                            <button
-                                onClick={() => setSearchTerm('')}
-                                className="mt-4 text-sm text-blue-600 hover:text-blue-800 font-medium"
-                            >
-                                Limpiar búsqueda
-                            </button>
+                        <div className="text-center py-12">
+                            <p className="text-gray-500">No se encontraron alumnos con esa búsqueda.</p>
                         </div>
                     ) : (
-                        <div className="bg-white rounded-lg shadow overflow-hidden">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contacto</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Link Rutina</th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                    {filteredStudents.map((student) => (
-                                        <tr key={student.id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-medium text-gray-900">{student.name}</div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-500">{student.email || '-'}</div>
-                                                <div className="text-sm text-gray-500">{student.phone || '-'}</div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <button
-                                                    onClick={() => copyLink(student.public_share_id)}
-                                                    className="text-indigo-600 hover:text-indigo-900 text-sm font-medium inline-flex items-center gap-1"
-                                                >
-                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                                    </svg>
-                                                    Copiar Link
-                                                </button>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <AnimatePresence>
+                                {filteredStudents.map((student) => (
+                                    <motion.div
+                                        key={student.id}
+                                        layout
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.9 }}
+                                        className="card p-5 flex flex-col gap-4 group"
+                                    >
+                                        <div className="flex justify-between items-start">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                                                    {student.name.charAt(0).toUpperCase()}
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-bold text-gray-900">{student.name}</h3>
+                                                    <p className="text-xs text-gray-500">ID: {student.id}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button
                                                     onClick={() => handleEdit(student)}
-                                                    className="text-blue-600 hover:text-blue-900 mr-4"
+                                                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                 >
-                                                    Editar
+                                                    <Edit2 size={18} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(student.id)}
-                                                    className="text-red-600 hover:text-red-900"
+                                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                 >
-                                                    Eliminar
+                                                    <Trash2 size={18} />
                                                 </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2 text-sm text-gray-600">
+                                            {student.email && (
+                                                <div className="flex items-center gap-2">
+                                                    <Mail size={16} className="text-gray-400" />
+                                                    {student.email}
+                                                </div>
+                                            )}
+                                            {student.phone && (
+                                                <div className="flex items-center gap-2">
+                                                    <Phone size={16} className="text-gray-400" />
+                                                    {student.phone}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <button
+                                            onClick={() => copyLink(student.public_share_id)}
+                                            className="mt-auto w-full py-2 px-3 bg-gray-50 hover:bg-blue-50 text-blue-600 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors border border-gray-100 hover:border-blue-100"
+                                        >
+                                            <LinkIcon size={16} />
+                                            Copiar Link Rutina
+                                        </button>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
                         </div>
                     )}
                 </>
