@@ -21,6 +21,21 @@ const ExerciseLibrary = () => {
 
     const categories = ['Todas', 'Pecho', 'Espalda', 'Piernas', 'Hombros', 'Brazos', 'Core', 'Cardio', 'Otro'];
 
+    const getCategoryColor = (cat) => {
+        const colors = {
+            'Pecho': 'red',
+            'Espalda': 'blue',
+            'Piernas': 'green',
+            'Hombros': 'orange',
+            'Brazos': 'purple',
+            'Core': 'yellow',
+            'Cardio': 'pink',
+            'Otro': 'gray',
+            'Todas': 'gray'
+        };
+        return colors[cat] || 'gray';
+    };
+
     const { toasts, success, error } = useToast();
 
     const fetchExercises = async () => {
@@ -136,18 +151,22 @@ const ExerciseLibrary = () => {
 
             {/* Category Filter */}
             <div className="flex flex-wrap gap-2">
-                {categories.map((cat) => (
-                    <button
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat)}
-                        className={`px-4 py-2 rounded-xl font-medium transition-all ${selectedCategory === cat
-                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                            : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300 hover:bg-blue-50'
-                            }`}
-                    >
-                        {cat}
-                    </button>
-                ))}
+                {categories.map((cat) => {
+                    const color = getCategoryColor(cat);
+                    const isSelected = selectedCategory === cat;
+                    return (
+                        <button
+                            key={cat}
+                            onClick={() => setSelectedCategory(cat)}
+                            className={`px-4 py-2 rounded-xl font-medium transition-all border ${isSelected
+                                    ? `bg-${color}-600 text-white border-${color}-600 shadow-lg shadow-${color}-600/20`
+                                    : `bg-white text-gray-600 border-gray-200 hover:border-${color}-300 hover:bg-${color}-50 hover:text-${color}-600`
+                                }`}
+                        >
+                            {cat}
+                        </button>
+                    );
+                })}
             </div>
 
             {/* Search Bar */}
@@ -231,7 +250,7 @@ const ExerciseLibrary = () => {
                                                     </div>
                                                     <h3 className="font-bold text-gray-900 line-clamp-1">{exercise.name}</h3>
                                                 </div>
-                                                <span className="inline-block text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full font-medium">
+                                                <span className={`inline-block text-xs px-2 py-1 rounded-full font-medium bg-${getCategoryColor(exercise.category || 'Otro')}-50 text-${getCategoryColor(exercise.category || 'Otro')}-600`}>
                                                     {exercise.category || 'Otro'}
                                                 </span>
                                             </div>

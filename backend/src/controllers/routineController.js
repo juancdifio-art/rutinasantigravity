@@ -17,7 +17,7 @@ const getMyRoutines = async (req, res) => {
         const routinesWithExercises = await Promise.all(
             routinesResult.rows.map(async (routine) => {
                 const exercisesResult = await db.query(
-                    `SELECT re.*, e.name as exercise_name
+                    `SELECT re.*, e.name as exercise_name, e.category
                      FROM routine_exercises re
                      JOIN exercises e ON re.exercise_id = e.id
                      WHERE re.routine_id = $1

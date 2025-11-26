@@ -15,6 +15,21 @@ const RoutinesList = () => {
     const [expandedRoutine, setExpandedRoutine] = useState(null);
     const { toasts, success, error } = useToast();
 
+    const getCategoryColor = (cat) => {
+        const colors = {
+            'Pecho': 'red',
+            'Espalda': 'blue',
+            'Piernas': 'green',
+            'Hombros': 'orange',
+            'Brazos': 'purple',
+            'Core': 'yellow',
+            'Cardio': 'pink',
+            'Otro': 'gray',
+            'Todas': 'gray'
+        };
+        return colors[cat] || 'gray';
+    };
+
     // Form State
     const [routineName, setRoutineName] = useState('');
     const [routineDescription, setRoutineDescription] = useState('');
@@ -234,7 +249,12 @@ const RoutinesList = () => {
                                                                 <div className="bg-blue-50 p-2 rounded-lg text-blue-600">
                                                                     <Dumbbell size={16} />
                                                                 </div>
-                                                                <span className="font-medium text-gray-900">{ex.exercise_name}</span>
+                                                                <div>
+                                                                    <span className="font-medium text-gray-900 block">{ex.exercise_name}</span>
+                                                                    <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mt-1 bg-${getCategoryColor(ex.category || 'Otro')}-50 text-${getCategoryColor(ex.category || 'Otro')}-600`}>
+                                                                        {ex.category || 'Otro'}
+                                                                    </span>
+                                                                </div>
                                                             </div>
                                                             <div className="flex gap-4 text-sm text-gray-600">
                                                                 <span className="bg-gray-100 px-2 py-1 rounded-md"><b>{ex.series}</b> series</span>
@@ -340,9 +360,17 @@ const RoutinesList = () => {
                                                     required
                                                 >
                                                     <option value="">Seleccionar ejercicio...</option>
-                                                    {exercises.map(ex => (
-                                                        <option key={ex.id} value={ex.id}>{ex.name}</option>
-                                                    ))}
+                                                    {['Pecho', 'Espalda', 'Piernas', 'Hombros', 'Brazos', 'Core', 'Cardio', 'Otro'].map(category => {
+                                                        const categoryExercises = exercises.filter(e => (e.category || 'Otro') === category);
+                                                        if (categoryExercises.length === 0) return null;
+                                                        return (
+                                                            <optgroup key={category} label={category}>
+                                                                {categoryExercises.map(ex => (
+                                                                    <option key={ex.id} value={ex.id}>{ex.name}</option>
+                                                                ))}
+                                                            </optgroup>
+                                                        );
+                                                    })}
                                                 </select>
 
                                                 <div className="flex gap-2 w-full sm:w-auto">
@@ -402,10 +430,10 @@ const RoutinesList = () => {
                                 </div>
                             </form>
                         </motion.div>
-                    </div>
+                    </div >
                 )}
-            </AnimatePresence>
-        </div>
+            </AnimatePresence >
+        </div >
     );
 };
 
