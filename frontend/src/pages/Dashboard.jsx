@@ -17,25 +17,26 @@ const Dashboard = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50 font-sans">
+    return (
+        <div className="min-h-screen font-sans">
             {/* Navbar */}
-            <nav className="bg-white border-b border-gray-200 sticky top-0 z-30">
+            <nav className="glass-nav">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
-                        <div className="flex items-center gap-2">
-                            <div className="bg-blue-600 p-2 rounded-lg">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-gradient-to-br from-blue-600 to-blue-500 p-2 rounded-xl shadow-lg shadow-blue-500/20">
                                 <Dumbbell className="text-white h-6 w-6" />
                             </div>
-                            <span className="text-xl font-bold text-gray-900 tracking-tight">GymManager</span>
+                            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 tracking-tight">GymManager</span>
                         </div>
                         <div className="flex items-center gap-4">
-                            <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full">
-                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <div className="hidden sm:flex items-center gap-2 text-sm font-medium text-slate-600 bg-slate-100/50 px-4 py-2 rounded-full border border-slate-200/50">
+                                <div className="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
                                 {user?.email}
                             </div>
                             <button
                                 onClick={logout}
-                                className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
                                 title="Cerrar Sesión"
                             >
                                 <LogOut size={20} />
@@ -47,7 +48,7 @@ const Dashboard = () => {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Tabs */}
-                <div className="flex space-x-1 bg-white p-1 rounded-xl shadow-sm border border-gray-200 mb-8 w-fit mx-auto sm:mx-0">
+                <div className="flex p-1.5 bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm border border-white/50 mb-8 w-fit mx-auto sm:mx-0">
                     {tabs.map((tab) => {
                         const Icon = tab.icon;
                         const isActive = activeTab === tab.id;
@@ -56,19 +57,20 @@ const Dashboard = () => {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`
-                                    relative flex items-center gap-2 px-6 py-2.5 text-sm font-medium rounded-lg transition-all duration-200
-                                    ${isActive ? 'text-blue-600' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}
+                                    relative flex items-center gap-2 px-6 py-2.5 text-sm font-medium rounded-xl transition-all duration-300
+                                    ${isActive ? 'text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'}
                                 `}
                             >
                                 {isActive && (
                                     <motion.div
                                         layoutId="activeTab"
-                                        className="absolute inset-0 bg-blue-50 rounded-lg"
+                                        className="absolute inset-0 bg-white rounded-xl shadow-sm border border-slate-100"
+                                        initial={false}
                                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                     />
                                 )}
                                 <span className="relative z-10 flex items-center gap-2">
-                                    <Icon size={18} />
+                                    <Icon size={18} className={isActive ? "stroke-[2.5px]" : "stroke-[2px]"} />
                                     {tab.label}
                                 </span>
                             </button>
