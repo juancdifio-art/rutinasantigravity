@@ -66,7 +66,28 @@ const RoutinesList = () => {
                 exercises: routineExercises
             };
             const created = await routineService.createRoutine(routineData);
-            setRoutines([created, ...routines]);
+
+            // Construir el objeto de rutina con los ejercicios poblados
+            const exercisesWithNames = routineExercises
+                .filter(ex => ex.exercise_id) // Filtrar ejercicios vacíos
+                .map((ex, index) => {
+                    const exercise = exercises.find(e => e.id === parseInt(ex.exercise_id));
+                    return {
+                        exercise_id: ex.exercise_id,
+                        exercise_name: exercise?.name || 'Ejercicio desconocido',
+                        series: ex.sets,
+                        repetitions: ex.reps,
+                        weight: ex.weight,
+                        order_index: index
+                    };
+                });
+
+            const routineWithExercises = {
+                ...created,
+                exercises: exercisesWithNames
+            };
+
+            setRoutines([routineWithExercises, ...routines]);
             success('Rutina creada exitosamente');
             setIsModalOpen(false);
             setRoutineName('');
