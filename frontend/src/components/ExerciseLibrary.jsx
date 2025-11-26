@@ -36,6 +36,65 @@ const ExerciseLibrary = () => {
         return colors[cat] || 'gray';
     };
 
+    const categoryStyles = {
+        'Pecho': {
+            active: 'bg-red-600 text-white border-red-600 shadow-lg shadow-red-600/20',
+            inactive: 'bg-white text-gray-600 border-gray-200 hover:border-red-300 hover:bg-red-50 hover:text-red-600',
+            badge: 'bg-red-100 text-red-600',
+            badgeLight: 'bg-red-50 text-red-600'
+        },
+        'Espalda': {
+            active: 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/20',
+            inactive: 'bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600',
+            badge: 'bg-blue-100 text-blue-600',
+            badgeLight: 'bg-blue-50 text-blue-600'
+        },
+        'Piernas': {
+            active: 'bg-green-600 text-white border-green-600 shadow-lg shadow-green-600/20',
+            inactive: 'bg-white text-gray-600 border-gray-200 hover:border-green-300 hover:bg-green-50 hover:text-green-600',
+            badge: 'bg-green-100 text-green-600',
+            badgeLight: 'bg-green-50 text-green-600'
+        },
+        'Hombros': {
+            active: 'bg-orange-600 text-white border-orange-600 shadow-lg shadow-orange-600/20',
+            inactive: 'bg-white text-gray-600 border-gray-200 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600',
+            badge: 'bg-orange-100 text-orange-600',
+            badgeLight: 'bg-orange-50 text-orange-600'
+        },
+        'Brazos': {
+            active: 'bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-600/20',
+            inactive: 'bg-white text-gray-600 border-gray-200 hover:border-purple-300 hover:bg-purple-50 hover:text-purple-600',
+            badge: 'bg-purple-100 text-purple-600',
+            badgeLight: 'bg-purple-50 text-purple-600'
+        },
+        'Core': {
+            active: 'bg-yellow-500 text-white border-yellow-500 shadow-lg shadow-yellow-500/20',
+            inactive: 'bg-white text-gray-600 border-gray-200 hover:border-yellow-300 hover:bg-yellow-50 hover:text-yellow-600',
+            badge: 'bg-yellow-100 text-yellow-700',
+            badgeLight: 'bg-yellow-50 text-yellow-700'
+        },
+        'Cardio': {
+            active: 'bg-pink-600 text-white border-pink-600 shadow-lg shadow-pink-600/20',
+            inactive: 'bg-white text-gray-600 border-gray-200 hover:border-pink-300 hover:bg-pink-50 hover:text-pink-600',
+            badge: 'bg-pink-100 text-pink-600',
+            badgeLight: 'bg-pink-50 text-pink-600'
+        },
+        'Otro': {
+            active: 'bg-gray-600 text-white border-gray-600 shadow-lg shadow-gray-600/20',
+            inactive: 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-600',
+            badge: 'bg-gray-100 text-gray-600',
+            badgeLight: 'bg-gray-50 text-gray-600'
+        },
+        'Todas': {
+            active: 'bg-gray-800 text-white border-gray-800 shadow-lg shadow-gray-800/20',
+            inactive: 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800',
+            badge: 'bg-gray-100 text-gray-600',
+            badgeLight: 'bg-gray-50 text-gray-600'
+        }
+    };
+
+    const getCategoryStyle = (cat) => categoryStyles[cat] || categoryStyles['Otro'];
+
     const getCategoryEmoji = (cat) => {
         const emojis = {
             'Pecho': '🏋️',
@@ -167,16 +226,13 @@ const ExerciseLibrary = () => {
             {/* Category Filter */}
             <div className="flex flex-wrap gap-2">
                 {categories.map((cat) => {
-                    const color = getCategoryColor(cat);
+                    const styles = getCategoryStyle(cat);
                     const isSelected = selectedCategory === cat;
                     return (
                         <button
                             key={cat}
                             onClick={() => setSelectedCategory(cat)}
-                            className={`px-4 py-2 rounded-xl font-medium transition-all border ${isSelected
-                                ? `bg-${color}-600 text-white border-${color}-600 shadow-lg shadow-${color}-600/20`
-                                : `bg-white text-gray-600 border-gray-200 hover:border-${color}-300 hover:bg-${color}-50 hover:text-${color}-600`
-                                }`}
+                            className={`px-4 py-2 rounded-xl font-medium transition-all border ${isSelected ? styles.active : styles.inactive}`}
                         >
                             {cat}
                         </button>
@@ -243,12 +299,12 @@ const ExerciseLibrary = () => {
                                         <div className="flex justify-between items-start">
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-3 mb-2">
-                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg bg-${getCategoryColor(exercise.category || 'Otro')}-100 text-${getCategoryColor(exercise.category || 'Otro')}-600`}>
+                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${getCategoryStyle(exercise.category || 'Otro').badge}`}>
                                                         {getCategoryEmoji(exercise.category || 'Otro')}
                                                     </div>
                                                     <h3 className="font-bold text-gray-900 line-clamp-1">{exercise.name}</h3>
                                                 </div>
-                                                <span className={`inline-block text-xs px-2 py-1 rounded-full font-medium bg-${getCategoryColor(exercise.category || 'Otro')}-50 text-${getCategoryColor(exercise.category || 'Otro')}-600`}>
+                                                <span className={`inline-block text-xs px-2 py-1 rounded-full font-medium ${getCategoryStyle(exercise.category || 'Otro').badgeLight}`}>
                                                     {exercise.category || 'Otro'}
                                                 </span>
                                             </div>

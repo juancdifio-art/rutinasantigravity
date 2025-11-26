@@ -30,6 +30,47 @@ const RoutinesList = () => {
         return colors[cat] || 'gray';
     };
 
+    const categoryStyles = {
+        'Pecho': {
+            badge: 'bg-red-100 text-red-600',
+            badgeLight: 'bg-red-50 text-red-600'
+        },
+        'Espalda': {
+            badge: 'bg-blue-100 text-blue-600',
+            badgeLight: 'bg-blue-50 text-blue-600'
+        },
+        'Piernas': {
+            badge: 'bg-green-100 text-green-600',
+            badgeLight: 'bg-green-50 text-green-600'
+        },
+        'Hombros': {
+            badge: 'bg-orange-100 text-orange-600',
+            badgeLight: 'bg-orange-50 text-orange-600'
+        },
+        'Brazos': {
+            badge: 'bg-purple-100 text-purple-600',
+            badgeLight: 'bg-purple-50 text-purple-600'
+        },
+        'Core': {
+            badge: 'bg-yellow-100 text-yellow-700',
+            badgeLight: 'bg-yellow-50 text-yellow-700'
+        },
+        'Cardio': {
+            badge: 'bg-pink-100 text-pink-600',
+            badgeLight: 'bg-pink-50 text-pink-600'
+        },
+        'Otro': {
+            badge: 'bg-gray-100 text-gray-600',
+            badgeLight: 'bg-gray-50 text-gray-600'
+        },
+        'Todas': {
+            badge: 'bg-gray-100 text-gray-600',
+            badgeLight: 'bg-gray-50 text-gray-600'
+        }
+    };
+
+    const getCategoryStyle = (cat) => categoryStyles[cat] || categoryStyles['Otro'];
+
     const getCategoryEmoji = (cat) => {
         const emojis = {
             'Pecho': '🏋️',
@@ -261,12 +302,12 @@ const RoutinesList = () => {
                                                     {routine.exercises && routine.exercises.map((ex, idx) => (
                                                         <div key={idx} className="bg-white p-3 rounded-xl border border-gray-100 flex items-center justify-between">
                                                             <div className="flex items-center gap-3">
-                                                                <div className={`p-2 rounded-lg text-lg bg-${getCategoryColor(ex.category || 'Otro')}-50 text-${getCategoryColor(ex.category || 'Otro')}-600`}>
+                                                                <div className={`p-2 rounded-lg text-lg ${getCategoryStyle(ex.category || 'Otro').badgeLight}`}>
                                                                     {getCategoryEmoji(ex.category || 'Otro')}
                                                                 </div>
                                                                 <div>
                                                                     <span className="font-medium text-gray-900 block">{ex.exercise_name}</span>
-                                                                    <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mt-1 bg-${getCategoryColor(ex.category || 'Otro')}-50 text-${getCategoryColor(ex.category || 'Otro')}-600`}>
+                                                                    <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mt-1 ${getCategoryStyle(ex.category || 'Otro').badgeLight}`}>
                                                                         {ex.category || 'Otro'}
                                                                     </span>
                                                                 </div>
