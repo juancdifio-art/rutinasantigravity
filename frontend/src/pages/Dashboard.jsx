@@ -17,7 +17,6 @@ const Dashboard = () => {
     ];
 
     return (
-    return (
         <div className="min-h-screen font-sans">
             {/* Navbar */}
             <nav className="glass-nav">
