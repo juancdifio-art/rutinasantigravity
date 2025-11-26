@@ -2,19 +2,38 @@ const db = require('../config/db');
 
 const getMyRoutines = async (req, res) => {
     try {
-        // Obtener rutinas con conteo de ejercicios (opcional, pero útil)
-        const result = await db.query(
-            `SELECT r.*, COUNT(re.id) as exercise_count 
-             FROM routines r 
-             LEFT JOIN routine_exercises re ON r.id = re.routine_id 
-             WHERE r.professor_id = $1 
-             GROUP BY r.id 
+        // Obtener rutinas con información del estudiante y ejercicios
+        const routinesResult = await db.query(
+            `SELECT r.*, s.name as student_name
+             FROM routines r
+             LEFT JOIN student_routines sr ON r.id = sr.routine_id
+             LEFT JOIN students s ON sr.student_id = s.id
+             WHERE r.professor_id = $1
              ORDER BY r.created_at DESC`,
             [req.user.id]
         );
-        res.json(result.rows);
+
+        // Para cada rutina, obtener sus ejercicios
+        const routinesWithExercises = await Promise.all(
+            routinesResult.rows.map(async (routine) => {
+                const exercisesResult = await db.query(
+                    `SELECT re.*, e.name as exercise_name
+                     FROM routine_exercises re
+                     JOIN exercises e ON re.exercise_id = e.id
+                     WHERE re.routine_id = $1
+                     ORDER BY re.order_index ASC`,
+                    [routine.id]
+                );
+                return {
+                    ...routine,
+                    exercises: exercisesResult.rows
+                };
+            })
+        );
+
+        res.json(routinesWithExercises);
     } catch (error) {
-        console.error(error);
+        console.error('Error al obtener rutinas:', error);
         res.status(500).json({ message: 'Error al obtener rutinas' });
     }
 };
@@ -53,18 +72,32 @@ const getRoutineById = async (req, res) => {
 };
 
 const createRoutine = async (req, res) => {
-    const { name, description, exercises } = req.body;
-    // exercises debe ser un array de objetos: { exercise_id, series, repetitions, weight, rest_time, notes }
+    const { student_id, exercises } = req.body;
+    // exercises debe ser un array de objetos: { exercise_id, sets, reps, weight }
 
     const client = await db.pool.connect();
 
     try {
         await client.query('BEGIN');
 
-        // 1. Crear Rutina
+        // Verificar que el alumno pertenece al profesor
+        const studentCheck = await client.query(
+            'SELECT id, name FROM students WHERE id = $1 AND professor_id = $2',
+            [student_id, req.user.id]
+        );
+
+        if (studentCheck.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ message: 'Alumno no encontrado' });
+        }
+
+        const studentName = studentCheck.rows[0].name;
+
+        // 1. Crear Rutina con nombre automático basado en el alumno
+        const routineName = `Rutina de ${studentName}`;
         const routineResult = await client.query(
-            'INSERT INTO routines (professor_id, name, description) VALUES ($1, $2, $3) RETURNING id, name, description',
-            [req.user.id, name, description]
+            'INSERT INTO routines (professor_id, name, description) VALUES ($1, $2, $3) RETURNING *',
+            [req.user.id, routineName, `Rutina personalizada para ${studentName}`]
         );
         const routine = routineResult.rows[0];
 
@@ -76,18 +109,39 @@ const createRoutine = async (req, res) => {
                     `INSERT INTO routine_exercises 
                     (routine_id, exercise_id, order_index, series, repetitions, weight, rest_time, notes) 
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-                    [routine.id, ex.exercise_id, i, ex.series, ex.repetitions, ex.weight, ex.rest_time, ex.notes]
+                    [
+                        routine.id,
+                        ex.exercise_id,
+                        i,
+                        ex.sets || ex.series || 3,
+                        ex.reps || ex.repetitions || '10',
+                        ex.weight || null,
+                        ex.rest_time || null,
+                        ex.notes || null
+                    ]
                 );
             }
         }
 
+        // 3. Asignar automáticamente la rutina al alumno
+        await client.query(
+            'INSERT INTO student_routines (student_id, routine_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+            [student_id, routine.id]
+        );
+
         await client.query('COMMIT');
-        res.status(201).json(routine);
+
+        // Devolver la rutina con información del estudiante
+        res.status(201).json({
+            ...routine,
+            student_name: studentName,
+            exercises: exercises
+        });
 
     } catch (error) {
         await client.query('ROLLBACK');
-        console.error(error);
-        res.status(500).json({ message: 'Error al crear rutina' });
+        console.error('Error al crear rutina:', error);
+        res.status(500).json({ message: 'Error al crear rutina', error: error.message });
     } finally {
         client.release();
     }
