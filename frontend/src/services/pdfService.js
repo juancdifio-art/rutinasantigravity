@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 const generateRoutinePDF = (routine) => {
     const doc = new jsPDF();
@@ -52,7 +52,7 @@ const generateRoutinePDF = (routine) => {
         });
     }
 
-    doc.autoTable({
+    autoTable(doc, {
         head: [tableColumn],
         body: tableRows,
         startY: routine.description ? 65 : 55,
