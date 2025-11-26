@@ -30,6 +30,21 @@ const RoutinesList = () => {
         return colors[cat] || 'gray';
     };
 
+    const getCategoryEmoji = (cat) => {
+        const emojis = {
+            'Pecho': '🏋️',
+            'Espalda': '🔙',
+            'Piernas': '🦵',
+            'Hombros': '💪',
+            'Brazos': '💪',
+            'Core': '⚡',
+            'Cardio': '🏃',
+            'Otro': '📋',
+            'Todas': '📋'
+        };
+        return emojis[cat] || '📋';
+    };
+
     // Form State
     const [routineName, setRoutineName] = useState('');
     const [routineDescription, setRoutineDescription] = useState('');
@@ -246,8 +261,8 @@ const RoutinesList = () => {
                                                     {routine.exercises && routine.exercises.map((ex, idx) => (
                                                         <div key={idx} className="bg-white p-3 rounded-xl border border-gray-100 flex items-center justify-between">
                                                             <div className="flex items-center gap-3">
-                                                                <div className="bg-blue-50 p-2 rounded-lg text-blue-600">
-                                                                    <Dumbbell size={16} />
+                                                                <div className={`p-2 rounded-lg text-lg bg-${getCategoryColor(ex.category || 'Otro')}-50 text-${getCategoryColor(ex.category || 'Otro')}-600`}>
+                                                                    {getCategoryEmoji(ex.category || 'Otro')}
                                                                 </div>
                                                                 <div>
                                                                     <span className="font-medium text-gray-900 block">{ex.exercise_name}</span>

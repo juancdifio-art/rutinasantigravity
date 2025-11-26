@@ -36,6 +36,21 @@ const ExerciseLibrary = () => {
         return colors[cat] || 'gray';
     };
 
+    const getCategoryEmoji = (cat) => {
+        const emojis = {
+            'Pecho': '🏋️',
+            'Espalda': '🔙',
+            'Piernas': '🦵',
+            'Hombros': '💪',
+            'Brazos': '💪',
+            'Core': '⚡',
+            'Cardio': '🏃',
+            'Otro': '📋',
+            'Todas': '📋'
+        };
+        return emojis[cat] || '📋';
+    };
+
     const { toasts, success, error } = useToast();
 
     const fetchExercises = async () => {
@@ -159,8 +174,8 @@ const ExerciseLibrary = () => {
                             key={cat}
                             onClick={() => setSelectedCategory(cat)}
                             className={`px-4 py-2 rounded-xl font-medium transition-all border ${isSelected
-                                    ? `bg-${color}-600 text-white border-${color}-600 shadow-lg shadow-${color}-600/20`
-                                    : `bg-white text-gray-600 border-gray-200 hover:border-${color}-300 hover:bg-${color}-50 hover:text-${color}-600`
+                                ? `bg-${color}-600 text-white border-${color}-600 shadow-lg shadow-${color}-600/20`
+                                : `bg-white text-gray-600 border-gray-200 hover:border-${color}-300 hover:bg-${color}-50 hover:text-${color}-600`
                                 }`}
                         >
                             {cat}
@@ -245,8 +260,8 @@ const ExerciseLibrary = () => {
                                         <div className="flex justify-between items-start">
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-3 mb-2">
-                                                    <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600">
-                                                        <Dumbbell size={20} />
+                                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg bg-${getCategoryColor(exercise.category || 'Otro')}-100 text-${getCategoryColor(exercise.category || 'Otro')}-600`}>
+                                                        {getCategoryEmoji(exercise.category || 'Otro')}
                                                     </div>
                                                     <h3 className="font-bold text-gray-900 line-clamp-1">{exercise.name}</h3>
                                                 </div>
