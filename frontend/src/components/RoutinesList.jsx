@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, ClipboardList, Trash2, ChevronDown, ChevronUp, Dumbbell, Calendar, User, Save, X } from 'lucide-react';
+import { Plus, ClipboardList, Trash2, ChevronDown, ChevronUp, Dumbbell, Calendar, User, Save, X, Download } from 'lucide-react';
 import routineService from '../services/routineService';
 import studentService from '../services/studentService';
 import exerciseService from '../services/exerciseService';
+import pdfService from '../services/pdfService';
 import { useToast, ToastContainer } from '../hooks/useToast';
 
 const RoutinesList = () => {
@@ -278,6 +279,13 @@ const RoutinesList = () => {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); pdfService.generateRoutinePDF(routine); }}
+                                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                            title="Descargar PDF"
+                                        >
+                                            <Download size={18} />
+                                        </button>
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleDelete(routine.id); }}
                                             className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
